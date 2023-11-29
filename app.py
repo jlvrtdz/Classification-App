@@ -1,8 +1,7 @@
 # Import necessary libraries
 import streamlit as st
 import pandas as pd
-import joblib
-from preprocessing_utils import encode_features
+from model import load_model, predict_diagnosis
 
 # Set page configuration and theme
 st.set_page_config(
@@ -10,9 +9,9 @@ st.set_page_config(
     page_icon=":test_tube:"
 )
 
-# Load the pre-trained machine learning model
+# Load the pre-trained model
 model_path = r'C:\Users\Administrator\Downloads\best_model.joblib'
-model = joblib.load(model_path, mmap_mode=None)
+model = load_model(model_path)
 
 # Sidebar information
 st.sidebar.title("Classification of Urinary Tract Infection (UTI) Diagnosis: Reducing Misdiagnosis Using Machine Learning")
@@ -92,6 +91,11 @@ if predict_button:
 
     user_input_df = pd.DataFrame([user_input])
 
+    # Check if any of the required fields are empty
+    if not all(user_input_df.notnull().values.flatten()):
+        st.error("Please fill in all fields before diagnosing.")
+        st.stop()
+
     # Display the input data in a table
     st.subheader("Input Data :pencil:", divider='grey')
     st.dataframe(user_input_df)
@@ -103,22 +107,17 @@ if predict_button:
     # Trigger the download of the CSV file
     st.download_button("Download CSV File",csv_file_path, mime = "text/csv", file_name="urine_test_results.csv")
 
-    # Encode the categorical inputs using the 'encode_features' function
-    encoded_user_input = encode_features(
-        user_input_df,
-        ordinal_features=["Transparency", "Epithelial_Cells", "Mucous_Threads", "Amorphous_Urates", "Bacteria",
-                          "Color", "Protein", "Glucose", "WBC", "RBC"],
-        nominal_features=["Gender"]
-    )
-
     # Make a prediction using the pre-trained model
-    pred = model.predict(encoded_user_input)
+    pred = predict_diagnosis(model, user_input_df)
 
-    # Check if WBC is LOADED or TNTC
+# Check if WBC is LOADED or TNTC
     if WBC == "LOADED" or WBC == "TNTC":
         diagnosis = "POSITIVE"
     else:
-        diagnosis = "POSITIVE" if pred else "NEGATIVE"
+        if pred:
+            diagnosis = "POSITIVE"
+        else:
+            diagnosis = "NEGATIVE"
 
     # Display the diagnosis with conditional formatting
     st.subheader("Diagnosis :stethoscope:", divider='grey')
