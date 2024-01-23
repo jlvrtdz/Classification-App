@@ -1,28 +1,5 @@
 import numpy as np
-
-def custom_sort(value):
-    """
-        Sorting string range values, and with greater than or less than, e.g, 80-90, <50, 100> or LOADED
-
-        Parameters
-        ------------
-        value : str
-            the string data that needs to be sorted
-
-        Returns
-        ------------
-        if ```value``` contains ,>,, return an integer without the sign.
-        elif ```value``` is equal to LOADED or TNTC (Too Numerous to Count), return the highest floating point number.
-        elif ```value``` is a range e.g 10-15, calculate the midpoint of the range by splitting the range into two number and return the midpoint
-    """
-    
-    if value.__contains__(">"):
-        return int(value.replace(">", ""))
-    elif value.isalpha():
-        return int(np.finfo(np.float64).max)
-    else:
-        start, end = map(int, value.split("-"))
-        return start + (end - start) / 2
+import pandas as pd
 
 def encode_features(dataframe_, ordinal_features, nominal_features):
     """
@@ -92,7 +69,7 @@ def encode_features(dataframe_, ordinal_features, nominal_features):
     
     
     for ordinal in ordinal_features:
-        if ordinal in ["Epithelial_Cells", "Mucous_Threads", "Amorphous_Urates", "Bacteria"]:
+        if ordinal in ["Epithelial Cells", "Mucous Threads", "Amorphous Urates", "Bacteria"]:
             dataframe_[ordinal] = dataframe_[ordinal].map(MAPPING_REFERENCE["ABSENCE_REFERENCE"])
 
         elif ordinal in ["Protein", "Glucose"]:
@@ -116,8 +93,12 @@ def encode_features(dataframe_, ordinal_features, nominal_features):
             dataframe_[ordinal] = dataframe_[ordinal].map(MAPPING_REFERENCE[ordinal])
             
     for nominal in nominal_features:
-
-        dataframe_["FEMALE"] = [True if dataframe_[nominal].values[0] == "FEMALE" else False]
-        dataframe_ = dataframe_.drop(nominal, axis=1)
-        
+        gender = dataframe_[nominal].values[0]
+        if  gender == "MALE":
+            dataframe_["FEMALE"] = [False]
+            dataframe_ = dataframe_.drop(nominal, axis=1)
+        else:
+            dataframe_["FEMALE"] = [True]
+            dataframe_ = dataframe_.drop(nominal,axis =1)
+            
     return dataframe_
