@@ -143,7 +143,9 @@ if predict_button:
             diagnosis = "POSITIVE"
         else:
             diagnosis = "NEGATIVE"
+            
     print(numpy_array)
+    print(pred_LGBM)
     print(pred_ensemble)
     print(predicted_class)
 
