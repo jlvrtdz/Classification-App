@@ -70,9 +70,9 @@ class ClassifierNN(nn.Module):
 
 MLP = ClassifierNN()
 
-MLP.load_state_dict(torch.load(r"C:\Users\Administrator\Downloads\mlp_parameters_tensor.pth"))
+MLP.load_state_dict(torch.load(r"Streamlit\mlp_parameters_tensor.pth"))
 
 
 # Load the pre-trained LGBM
-LGBM_path = r"C:\Users\Administrator\Downloads\best_model (imbalanced).joblib"
+LGBM_path = r"Streamlit\best_model (imbalanced).joblib"
 LGBM = joblib.load(LGBM_path, mmap_mode=None)
