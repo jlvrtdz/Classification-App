@@ -1,6 +1,6 @@
 import joblib
 import torch
-import numpy as np
+
 import pandas as pd
 from preprocessing_utils import encode_features
 from model import MLP, LGBM
